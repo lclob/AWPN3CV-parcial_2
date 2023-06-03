@@ -1,2 +1,3 @@
-# AWPN3CV-parcial_2
-Aplicaciones Web Progresivas - Parcial 2 
+# AWPN3CV - parcial 2
+## Lautaro Climent
+### movies-channel
