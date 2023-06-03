@@ -1,0 +1,119 @@
+/*
+  paleta de colores - https://coolors.co/f6d8ae-cee461-dddddd-083d77-da4167
+*/
+
+body {
+  background-color: #DDDDDD;
+}
+.form-control, .form-control:active, .form-control:focus, .form-control:hover, .form-control:focus-visible {
+  background-color: #DDDDDD;
+  border-color: black;
+  outline: none;
+  box-shadow: none;
+}
+.btn-primary, .btn-primary:active, .btn-primary:focus, .btn-primary:hover, .btn-primary:focus-visible{
+  background-color: #CEE461;
+  border-color: black;
+  color: black;
+  outline: none;
+  box-shadow: none;
+}
+.card{
+  background-color: #DDDDDD;
+  border-color: black;
+}
+
+.list-group-item{
+  background-color: #DDDDDD;
+  border-color: black;
+}
+
+.bg-primary{
+  background-color: #CEE461 !important;
+  border-color: black;
+  color: black;
+  outline: none;
+  box-shadow: none;
+}
+
+.card-title{
+  font-size: 1rem;
+}
+
+iframe{
+  width: 100%;
+  height: 100%;
+  border-radius: var(--bs-card-border-radius);
+}
+
+.map{
+  padding: var(--bs-card-spacer-y) var(--bs-card-spacer-x);
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  height: 500px;
+}
+
+.imagen{
+  border-radius: var(--bs-card-border-radius);
+  height: 413px;
+  object-fit: cover;
+}
+
+img{
+  height: 300px;
+  object-fit: cover;
+  width: 100%;
+  max-width: 100%;
+}
+
+#resultado{
+  min-height: calc(100vh - 170px);
+}
+
+.spinner{
+  min-height: 100%;
+  align-items: center;
+}
+
+span{
+  color: black !important;
+}
+
+.bg-s{
+  background-color: rgb(170, 170, 170);
+  transform: scale(.9);
+}
+
+.temps{
+  display: flex;
+  gap: .25rem;
+}
+
+.carousel-control-prev-icon {
+  background-image: url('../img/arrowleft.svg');
+}
+.carousel-control-next-icon {
+  background-image: url('../img/arrow.svg');
+}
+
+@media screen and  (max-width:768px){
+  .mobile div:nth-child(1){
+    order: 2;
+  }
+  .mobile div:nth-child(2){
+    order: 1;
+  }
+  .mobile div:nth-child(3){
+    order: 3;
+  }
+  .mobile div:nth-child(4){
+    order: 4;
+  }
+}
+
+@media screen and  (max-width:480px){
+  .temps{
+    flex-direction: column;
+  }  
+}
