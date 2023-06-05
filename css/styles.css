@@ -36,6 +36,15 @@ body {
   box-shadow: none;
 }
 
+.text-primary{
+  color: #CEE461 !important;
+}
+
+.badge{
+  border: 1px solid black;
+  color: black;
+}
+
 .card-title{
   font-size: 1rem;
 }
@@ -56,12 +65,10 @@ iframe{
 
 .imagen{
   border-radius: var(--bs-card-border-radius);
-  height: 413px;
-  object-fit: cover;
 }
 
 img{
-  height: 300px;
+  min-height: 200px;
   object-fit: cover;
   width: 100%;
   max-width: 100%;
@@ -116,4 +123,14 @@ span{
   .temps{
     flex-direction: column;
   }  
+}
+
+/* modal movie details */
+.list-group-item{
+  background-color: inherit;
+}
+
+.details-image{
+  width: 150px;
+  border-radius: 0.375rem;
 }

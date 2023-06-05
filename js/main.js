@@ -4,6 +4,9 @@ const buttonSearch = document.getElementById('buscar');
 const resultElement = document.getElementById('resultado');
 const APIkey = '7f2dd986';
 const APIGoogle = 'AIzaSyAYW3g3NRld4PtVL4Bmz04tueXbASg8o-g';
+const APIYoutube = 'AIzaSyBtw6tawmeSBff5hi10gg3w-YZXVbWETUI'
+let page = 1;
+let favs = [];
 
 // localStorage
 if (!localStorage.getItem("search_value")) {
@@ -15,7 +18,6 @@ if (!localStorage.getItem("search_value")) {
 
 // API call
 function apiCall(value) {
-  let page = 1;
   fetch(`http://www.omdbapi.com/?apikey=${APIkey}&s=${value}&page=${page}&type="movie"`)
     .then(resp => {
       return resp.json();
@@ -90,147 +92,109 @@ function setData(data) {
     div.innerHTML = `
       <div class="card mb-3 h-100">
         <div class="row g-0 h-100">
-          <div class="col-md-6 h-100 imagen"></div>
+          <div class="col-md-6 h-100 imagen">
+            <img src="${movie.Poster}" alt="Poster de ${movie.Title}" class="rounded-start h-100"/>
+          </div>
           <div class="col-md-6">
-            <div class="card-body">
-              <h5 class="card-title">${movie.Title}</h5>
-              <p class="card-text">${movie.Year}</p>
+            <div class="card-body d-flex flex-column justify-content-between h-100">
+              <div>
+                <h2 class="card-title fw-semibold">${movie.Title}</h2>
+                <p class="card-text">${movie.Year}</p>
+              </div>
+              <button class="btn fw-semibold btn-primary btn-details" data-id="${movie.imdbID}" data-bs-toggle="modal" data-bs-target="#staticBackdrop-${movie.imdbID}">Ver más!</button>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="staticBackdrop-${movie.imdbID}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+          <div class="modal-content">
           </div>
         </div>
       </div>
     `;
 
-    let divImagen = div.querySelector('.imagen');
-    spinner(divImagen);
-    createImage(movie, divImagen);
+    let btn = div.querySelector('.btn-details');
+    let id = btn.dataset.id;
+    APImovieDetails(id, div);
   });
 }
 
-function createImage(movie, div) {
-  let img = document.createElement('img');
-  img.classList.add('rounded-start', 'h-100');
-  img.alt = `Poster de ${movie.Title}`;
-  img.src= `${movie.Poster}`;
-  div.innerHTML = '';
-  div.append(img);
+// api call by imdbID
+function APImovieDetails(id, div) {
+  fetch(`http://www.omdbapi.com/?apikey=${APIkey}&i=${id}&page=${page}&type="movie"`)
+    .then(resp => {
+      return resp.json();
+    })
+    .then(data => {
+      modalMovieDetails(data, div);
+    })
+    .catch(err => {
+      console.log(`Hubo un error: ${err}`);
+    })
+    .finally(() => {
+      console.log('ejecuto el finally');
+    })
 }
 
-/*
-// API weather
-function setInfo(data) {
-  console.log('data cruda:', data);
-
-  const
-    name = data.name,
-    temp = data.main.temp.toFixed(1),
-    tempMax = data.main.temp_max.toFixed(1),
-    temMin = data.main.temp_min.toFixed(1),
-    humedad = data.main.humidity,
-    st = data.main.feels_like,
-    pa = data.main.pressure,
-    wind = (data.wind.speed * 3.6).toFixed(1),
-    lat = data.coord.lat,
-    lon = data.coord.lon,
-    day = data.weather[0].icon.at(-1);
-  ;
-
-  let dayname = "";
-  if (day == "d") {
-    dayname = "Día"
-  } else if (day == "n") {
-    dayname = "Noche"
-  }
-
-  document.querySelector(".card")?.remove();
-  let div = document.createElement("div");
-  div.classList.add("card", "mb-3");
-  resultElement.appendChild(div);
-  div.innerHTML = `
-    <div class="row mobile g-0">
-      <div id="carouselExample" class="col-md-4 carousel slide carousel-fade">
-        <div class="carousel-inner img">
-        </div>
+// modal con datos de la pelicula
+function modalMovieDetails(data, div) {
+  const content = div.querySelector('.modal-content');
+  content.innerHTML = `
+    <div class="modal-header gap-md-0 gap-2 align-items-start">
+      <img src="${data.Poster}" alt="Imagen de ${data.Title}" class="details-image" />
+      <div class="px-md-3"> 
+        <h3 id="staticBackdropLabel">${data.Title}</h3>
+        <small class="d-block text-secondary mt-2">${data.Genre}</small>
+        <small class="d-block mt-1">${data.Country}</small>
+        <span class="badge bg-primary rounded-pill mt-2 rating">${data.imdbRating}</span>
       </div>
-      <div class="col-md-8">
-        <div class="card-body">
-          <h2 class="card-title badge bg-primary rounded-pill p-3">${name}</h2>
-          <ul class="list-group">
-            <li class="list-group-item d-flex justify-content-between align-items-center fw-semibold">${dayname}</li>
-            <li class="list-group-item d-flex justify-content-between align-items-center fw-semibold">Temperatura: 
-            <div class="temps">
-              <span class="badge bg-s rounded-pill p-2">${temMin} °C</span>
-              <span class="badge bg-primary rounded-pill p-2">${temp} °C</span>
-              <span class="badge bg-s rounded-pill p-2">${tempMax} °C</span>
-            </div>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center fw-semibold">Humedad: <span class="badge bg-primary rounded-pill p-2">${humedad} %</span></li>
-            <li class="list-group-item d-flex justify-content-between align-items-center fw-semibold">Sensación Térmica: <span class="badge bg-primary rounded-pill p-2">${st} °C</span></li>
-            <li class="list-group-item d-flex justify-content-between align-items-center fw-semibold">Presión Atmosférica: <span class="badge bg-primary rounded-pill p-2">${pa} hPa</span></li>
-            <li class="list-group-item d-flex justify-content-between align-items-center fw-semibold">Viento: <span class="badge bg-primary rounded-pill p-2">${wind} km/h</span></li>
-            <li class="list-group-item d-flex justify-content-between align-items-center fw-semibold">Latitud:<span class="badge bg-primary rounded-pill p-2">${lat}</span></li>
-            <li class="list-group-item d-flex justify-content-between align-items-center fw-semibold">Longitud: <span class="badge bg-primary rounded-pill p-2">${lon}</span></li>
-          </ul>
-        </div>
-      </div>
-      <div class="col-8 m-auto">
-        <div class="line"></div>
-      </div>
-      <div class="col-12">
-        <div class="map"></div>
-      </div>
+      <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+      <p>${data.Plot}</p>
+      <ul class="list-group table-striped">
+        <li class="list-group-item fw-semibold">Reparto: <span class="fw-normal">${data.Actors}</span></li>
+        <li class="list-group-item fw-semibold">Director: <span class="fw-normal">${data.Director}</span></li>
+        <li class="list-group-item fw-semibold">Escritor: <span class="fw-normal">${data.Writer}</span></li>
+        <li class="list-group-item fw-semibold">Duración: <span class="fw-normal">${data.Runtime}</span></li>
+        <li class="list-group-item fw-semibold">Lanzamiento: <span class="fw-normal">${data.Released}</span></li>
+      </ul>
+      <div id="ytplayer"></div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" data-id="${data.imdbID}" class="btn btn-primary w-100 btnFav">Agregar a favoritos</button>
+    </div>
   `;
 
-  let img = document.querySelector('.img');
-  spinner(img);
-};
-
-// API maps
-function map(name, coord) {
-  let map = document.querySelector('.map');
-  let iframe = document.createElement('iframe');
-  map.append(iframe);
-  iframe.src = `https://www.google.com/maps/embed/v1/place?key=${APIGoogle}&q=${name}&center=${coord.lat}, ${coord.lon}`;
-};
-
-// imagen
-function slider(image) {
-  let photos = image.photos;
-  const photo = image.photos[0];
-  console.log(photos)
-
-  let slider = document.querySelector('.img');
-  slider.innerHTML = '';
-  
-  photos.forEach(pic => {
-    let img = document.createElement('div');
-
-    if (pic != photo) {
-      img.classList.add('carousel-item', 'img-secondary',);
-      img.innerHTML = `
-        <img src="${pic.src.large}" class="d-block w-100 imagen" alt="imagen de ${pic.alt}">
-      `;
-    } else {
-      img.classList.add('carousel-item', 'img-active', 'active');
-      img.innerHTML = `
-       <img src="${photo.src.large}" class="d-block w-100 imagen" alt="imagen de ${photo.alt}}">
-      `;
-    }
-
-    slider.append(img);
-    slider.innerHTML += `
-      <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Previous</span>
-      </button>
-      <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Next</span>
-      </button>
-    `;
-  });
+  let btnFav = content.querySelector('.btnFav')
+  agregarFavoritos(data.imdbID, btnFav);
+  console.log(data)
 }
-*/
+
+//favoritos
+function actualizarFavoritos() {
+  return JSON.parse(localStorage.getItem("favoritos")) || null;
+}
+
+function agregarFavoritos(data, btn) {
+  btn.addEventListener('click', function () {
+    let favoritos = actualizarFavoritos();
+    if (!favoritos) {
+      favs.push(data);
+      localStorage.setItem("favoritos", JSON.stringify([favs]));
+    } else{
+        let favMovie = favs.filter(movie => movie == data)[0];
+        if(!favMovie){
+          favs.push(data);
+          localStorage.setItem("favoritos", JSON.stringify([favs]));
+        }
+    }
+    console.log(favs)
+    btn.innerText = 'Agregado a favoritos'
+  })
+}
 
 // salvavidas
 function salvaVidas() {
