@@ -3,13 +3,17 @@
 
   <head>
     <title>AWPN3CV - LAUTARO CLIMENT - PARCIAL 2</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
     <link rel="icon" type="image/png" href="img/favicon.png">
+
+    <!-- Include Dexie -->
+    <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/styles.css">
-    <!--link rel="manifest" href="/manifest.json"-->
   </head>
 
   <body>
@@ -19,7 +23,7 @@
           <h1 class="mb-2 text-center text-md-start">movies-channel</h1>
           <div class="col-md-6 col-lg-4 mb-3">
             <div class="input-group mb-3">
-              <input type="text" id="inputBusqueda" class="form-control" placeholder="Ingrese el lugar a buscar"
+              <input type="text" id="inputBusqueda" class="form-control" placeholder="Ingrese la pelicula a buscar"
                 aria-label="place">
               <button id="buscar" type="submit" class="btn btn-primary fw-semibold">Buscar</button>
             </div>
@@ -34,10 +38,12 @@
     <footer class="text-center">
       <p>movies-channel</p>
     </footer>
-
+    
+    <script src="js/dexie.js"></script>
+    <script src="js/register-sw.js"></script>
+    <script src="js/main.js"></script>
     <script src="https://code.jquery.com/jquery.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.min.js"></script>
-    <script src="js/main.js"></script>
   </body>
 
 </html>

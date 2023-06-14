@@ -5,6 +5,7 @@ const resultElement = document.getElementById('resultado');
 const APIkey = '7f2dd986';
 const APIGoogle = 'AIzaSyAYW3g3NRld4PtVL4Bmz04tueXbASg8o-g';
 const APItmbdb = '3fae9e615d9aaca0a304824bd82082e1'
+const noImage = '../img/no_image.jpeg';
 let page = 1;
 let favs = [];
 
@@ -86,20 +87,27 @@ function spinner(resultado) {
 
 // crea una card con los datos de la busqueda
 function setData(data) {
-  data.Search.forEach(movie => {
+  data.Search.forEach(async movie => {
+    // obtengo respuesta de indexedDB y guardo en variable el imdbID de la pelicula
+    let movieID = await getMovie(movie.imdbID)
+    console.log(movieID)
+
     let div = document.createElement("div");
     div.classList.add('col');
     resultElement.appendChild(div);
     div.innerHTML = `
       <div class="card mb-3 h-100">
         <div class="row g-0 h-100">
-          <div class="col-md-6 h-100 imagen">
-            <img src="${movie.Poster}" alt="Poster de ${movie.Title}" class="rounded-start h-100"/>
+        <div class="col-md-6 h-100 imagen">
+            <img src="${movie.Poster != 'N/A' ? movie.Poster :  noImage }" alt="Poster de ${movie.Title}" class="rounded-start h-100"/>
           </div>
           <div class="col-md-6">
-            <div class="card-body d-flex flex-column justify-content-between h-100">
-              <div>
-                <h2 class="card-title fw-semibold">${movie.Title}</h2>
+          <div class="card-body d-flex flex-column justify-content-between h-100">
+          <div>
+                <div class="row">
+                <h2 class="card-title fw-semibold col-8">${movie.Title}</h2>
+                  <i id="btn1-${movie.imdbID}" class="bi ${movieID ? 'bi-heart-fill' : 'bi-heart'} text-end d-block fs-5 col-4 fav-icon"></i>
+                </div>
                 <p class="card-text">${movie.Year}</p>
               </div>
               <button class="btn fw-semibold btn-primary btn-details" data-id="${movie.imdbID}" data-bs-toggle="modal" data-bs-target="#staticBackdrop-${movie.imdbID}">Ver más!</button>
@@ -119,6 +127,10 @@ function setData(data) {
     let btn = div.querySelector('.btn-details');
     let id = btn.dataset.id;
     APImovieDetails(id, div);
+
+    // favs
+    let btnFav = document.getElementById(`btn1-${movie.imdbID}`);
+    setFav(movie, btnFav);
   });
 }
 
@@ -140,16 +152,22 @@ function APImovieDetails(id, div) {
 }
 
 // modal con datos de la pelicula
-function modalMovieDetails(data, div) {
+async function modalMovieDetails(data, div) {
   const content = div.querySelector('.modal-content');
+
+  // obtengo respuesta de indexedDB y guardo en variable el imdbID de la pelicula
+  let movieID = await getMovie(data.imdbID)
   content.innerHTML = `
     <div class="modal-header gap-md-0 gap-2 align-items-start">
-      <img src="${data.Poster}" alt="Imagen de ${data.Title}" class="details-image" />
+      <img src="${data.Poster != 'N/A' ? data.Poster : noImage}" alt="Imagen de ${data.Title}" class="details-image" />
       <div class="px-md-3"> 
-        <h3 id="staticBackdropLabel">${data.Title}</h3>
-        <small class="d-block mt-1">${data.Country}</small>
+        <h3 id="staticBackdropLabel" class="mb-0">${data.Title}</h3>
         <small class="d-block text-secondary">${data.Genre}</small>
-        <span class="badge bg-primary rounded-pill mt-2 rating">${data.imdbRating}</span>
+        <small class="d-block text-secondary">${data.Country}</small>
+        <div class="d-flex align-items-center mt-2">
+          <span class="badge bg-primary rounded-pill rating d-block">${data.imdbRating}</span>
+          <i class="bi ${movieID ? 'bi-heart-fill' : 'bi-heart'} d-block fs-5 ms-2 fav-icon"></i>
+        </div>
       </div>
       <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
@@ -165,7 +183,7 @@ function modalMovieDetails(data, div) {
       <div class="trailer video-container-${data.imdbID} mt-1" class="my-1 rounded"></div>
     </div>
     <div class="modal-footer">
-      <button type="button" data-id="${data.imdbID}" class="btn btn-primary w-100 btnFav">Agregar a favoritos</button>
+      <button type="button" data-id="${data.imdbID}" class="btn btn-primary w-100 btnFav">${movieID ? 'Quitar de favoritos' : 'Agregar a favoritos'}</button>
     </div>
   `;
 
@@ -190,13 +208,12 @@ function MovieTrailer(movie, id) {
 
       // llamo a la api por id de pelicula para conseguir el id del video
       if(videoID){
-        fetch(`https://api.themoviedb.org/3/movie/${response.results[0].id}/videos?language=en-US`, options)
+        fetch(`https://api.themoviedb.org/3/movie/${videoID}/videos?language=en-US`, options)
           .then(response => response.json())
           .then(response => {
             let videoKEY = response.results[0]?.key;
-            console.log(videoKEY)
-
             if(videoKEY){
+              // obtengo el key del trailer para buscarlo en youtube
               let videoContainer = document.querySelector(`.video-container-${id}`);
               spinner(videoContainer);
 
@@ -218,6 +235,24 @@ function MovieTrailer(movie, id) {
       }
     })
     .catch(err => console.error(err));
+}
+
+// favoritos
+function setFav(movie, btn){
+  btn.addEventListener('click', () => {
+
+    if(btn.innerText != 'Ver más!'){
+      if(btn.classList.contains('bi-heart')){
+        btn.classList.remove('bi-heart');
+        btn.classList.add('bi-heart-fill');
+        saveData(movie); 
+      } else {
+        btn.classList.add('bi-heart');
+        btn.classList.remove('bi-heart-fill');
+        deleteFav(movie.imdbID);
+      }
+    }
+  })
 }
 
 
