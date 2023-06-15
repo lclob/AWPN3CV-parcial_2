@@ -1,49 +1,82 @@
 <!DOCTYPE html>
 <html lang="es">
 
-  <head>
-    <title>AWPN3CV - LAUTARO CLIMENT - PARCIAL 2</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
-    <link rel="icon" type="image/png" href="img/favicon.png">
+<head>
+  <title>AWPN3CV - LAUTARO CLIMENT - PARCIAL 2</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+  <link rel="icon" type="image/png" href="img/favicon.png">
 
-    <!-- Include Dexie -->
-    <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="css/styles.css">
-  </head>
+  <!-- Include Dexie -->
+  <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
 
-  <body>
-    <div class="container-fluid pt-5 px-3 px-md-5 m-auto w-100 mb-5">
-      <main class="row g-3 justify-content-center">
-        <div class="col-12">
-          <h1 class="mb-2 text-center text-md-start">movies-channel</h1>
-          <div class="col-md-6 col-lg-4 mb-3">
-            <div class="input-group mb-3">
-              <input type="text" id="inputBusqueda" class="form-control" placeholder="Ingrese la pelicula a buscar"
-                aria-label="place">
-              <button id="buscar" type="submit" class="btn btn-primary fw-semibold">Buscar</button>
+<body>
+
+  <nav class="navbar navbar-expand-lg m-auto px-3 px-md-5 w-100 justify-content-center align-items-center">
+    <div class="pt-3 d-block w-100 px-0">
+      <div class="row w-100 align-items-center px-0 m-0">
+        <div class="navbar-brand col ps-0">
+          <a href="#">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="black" class="bi bi-camera-reels"
+              viewBox="0 0 16 16">
+              <path d="M6 3a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM1 3a2 2 0 1 0 4 0 2 2 0 0 0-4 0z" />
+              <path
+                d="M9 6h.5a2 2 0 0 1 1.983 1.738l3.11-1.382A1 1 0 0 1 16 7.269v7.462a1 1 0 0 1-1.406.913l-3.111-1.382A2 2 0 0 1 9.5 16H2a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h7zm6 8.73V7.27l-3.5 1.555v4.35l3.5 1.556zM1 8v6a1 1 0 0 0 1 1h7.5a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1z" />
+              <path d="M9 6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM7 3a2 2 0 1 1 4 0 2 2 0 0 1-4 0z" />
+            </svg>
+          </a>
+        </div>
+        <div class="col text-center"><span>movies-channel</span></div>
+        <div class="col text-end pe-0">
+          <button class="navbar-toggler col" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo03"
+          aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarTogglerDemo03">
+            <div class="row navbar-nav g-1">
+              <div class="nav-item col m-0 mt-3 mt-lg-0"><button id="home" class="btn text-uppercase">Inicio</button></div>
+              <div class="nav-item col m-0 mt-3 mt-lg-0"><button id="fav" class="btn text-uppercase">Favoritos</button></div>
+              <div class="nav-item col m-0 mt-3 mt-lg-0"><button class="btn text-uppercase">Novedades</button></div>
             </div>
+        </div>
+        </div>
+      </div> 
+    </div>
+  </nav>
+
+  <div class="container-fluid pt-5 px-3 px-md-5 m-auto w-100 mb-5">
+    <main class="row g-3 justify-content-center">
+      <div class="col-12">
+        <h1 class="mb-2 text-center text-md-start">movies-channel</h1>
+        <div class="col-md-6 col-lg-4 mb-3">
+          <div class="input-group mb-3">
+            <input type="text" id="inputBusqueda" class="form-control" placeholder="Ingrese la pelicula a buscar"
+              aria-label="place">
+            <button id="buscar" type="submit" class="btn btn-primary fw-semibold">Buscar</button>
           </div>
         </div>
-        <div class="col-12">
-          <div id="resultado" class="row row-cols-sm-3 row-cols-lg-4 g-3"></div>
-        </div>
-      </main>
-    </div>
+      </div>
+      <div class="col-12">
+        <div id="resultado" class="row row-cols-sm-3 row-cols-lg-4 g-3"></div>
+      </div>
+    </main>
+  </div>
 
-    <footer class="text-center">
-      <p>movies-channel</p>
-    </footer>
-    
-    <script src="js/dexie.js"></script>
-    <script src="js/register-sw.js"></script>
-    <script src="js/main.js"></script>
-    <script src="https://code.jquery.com/jquery.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.min.js"></script>
-  </body>
+  <footer class="text-center">
+    <p>movies-channel</p>
+  </footer>
+
+  <script src="js/dexie.js"></script>
+  <script src="js/register-sw.js"></script>
+  <script src="js/main.js"></script>
+  <script src="https://code.jquery.com/jquery.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.min.js"></script>
+</body>
 
 </html>

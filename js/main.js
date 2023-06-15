@@ -25,7 +25,7 @@ function apiCall(value) {
     })
     .then(data => {
       resultElement.innerHTML = '';
-      setData(data);
+      setData(data.Search);
     })
     .catch(err => {
       console.log(`Hubo un error: ${err}`);
@@ -87,10 +87,10 @@ function spinner(resultado) {
 
 // crea una card con los datos de la busqueda
 function setData(data) {
-  data.Search.forEach(async movie => {
+  data.forEach(async movie => {
+
     // obtengo respuesta de indexedDB y guardo en variable el imdbID de la pelicula
     let movieID = await getMovie(movie.imdbID)
-    console.log(movieID)
 
     let div = document.createElement("div");
     div.classList.add('col');
@@ -255,6 +255,41 @@ function setFav(movie, btn){
   })
 }
 
+// get favoritos
+async function actualizarDataFavoritos() {
+  spinner(resultElement);
+  // Obtener los datos de favoritos utilizando getMovie()
+  const favoritos = await getData();
+
+  // Llamar a setData() con los datos de favoritos
+  resultElement.innerHTML = '';
+
+  if(favoritos.length){
+    setData(favoritos);
+  } else {
+    resultElement.innerHTML = '<p>Aún no tienes películas favoritas.</p>'
+  }
+}
+
+// manejo links
+function setEventListeners() {
+  const homeLink = document.getElementById('home');
+  const favoritosLink = document.getElementById('fav');
+
+  homeLink.addEventListener('click', () => {
+    const value = localStorage.getItem("search_value");
+    if (value) {
+      apiCall(value);
+    } else {
+      salvaVidas();
+    }
+  });
+
+  favoritosLink.addEventListener('click', () => {
+    actualizarDataFavoritos();
+  });
+}
+
 
 //salvavidas
 function salvaVidas() {
@@ -264,3 +299,4 @@ function salvaVidas() {
 //funciones
 btn();
 btnKey();
+setEventListeners();
