@@ -9,32 +9,19 @@ const APIyoutube = 'AIzaSyCTRMhSwgevh6jT9i-kdLVk5jOwBCTXSTo';
 const noImage = '../img/no_image.jpeg';
 
 // localStorage
-function getLocalStorage(){
-  if (!localStorage.getItem("search_value")) {
-    btn();
-  } else {
-    value = localStorage.getItem("search_value");
-    apiCall(value);
-  }
+function getLocalStorage() {
+  spinner(resultElement);
+  setTimeout(() => {
+    if (!localStorage.getItem("search_value")) {
+      btn();
+    } else {
+      value = localStorage.getItem("search_value");
+      apiCall(value);
+    }
+  }, 500)
 }
 
-// API call
-async function apiCall(value) {
-  try {
-    const response = await fetch(`http://www.omdbapi.com/?apikey=${APIkey}&s=${value}&page=1&type="movie"`);
-    const data = await response.json();
-    
-    resultElement.innerHTML = '';
-    setData(data.Search);
-  } catch (error) {
-    console.log(`Hubo un error: ${error}`);
-    salvaVidas();
-  } finally {
-    console.log('ejecuto el finally');
-  }
-}
-
-// search
+// search btn
 function btn() {
   buttonSearch.addEventListener('click', event => {
     event.preventDefault();
@@ -50,6 +37,7 @@ function btn() {
   });
 }
 
+// search enter
 function btnKey() {
   inputElement.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
@@ -67,13 +55,44 @@ function btnKey() {
   })
 }
 
-// crea una card con los datos de la busqueda
+
+// API movies - card
+async function apiCall(value) {
+  try {
+    const response = await fetch(`http://www.omdbapi.com/?apikey=${APIkey}&s=${value}&page=1&type="movie"`);
+    const data = await response.json();
+
+    resultElement.innerHTML = '';
+    setData(data.Search);
+  } catch (error) {
+    console.log(`Hubo un error: ${error}`);
+    salvaVidas();
+  } finally {
+    console.log('ejecuto el finally');
+  }
+}
+
+// API imdbID - modal
+async function APImovieDetails(id, div) {
+  try {
+    const resp = await fetch(`http://www.omdbapi.com/?apikey=${APIkey}&i=${id}&page=1&type="movie"`);
+    const data = await resp.json();
+    modalMovieDetails(data, div);
+  } catch (err) {
+    console.log(`Hubo un error: ${err}`);
+  } finally {
+    console.log('Ejecutó el finally');
+  }
+}
+
+// card
 function setData(data) {
   const row = document.createElement("div");
   row.classList.add('row', 'row-cols-1', 'row-cols-sm-2', 'row-cols-md-3', 'row-cols-lg-4', 'row-cols-xl-5', 'g-3', 'page');
   resultElement.append(row);
 
   data.forEach(async movie => {
+    // indexedDB
     const movieID = await getMovie(movie.imdbID);
 
     const div = document.createElement("div");
@@ -155,25 +174,11 @@ function setData(data) {
   });
 }
 
-// api call by imdbID
-async function APImovieDetails(id, div) {
-  try {
-    const resp = await fetch(`http://www.omdbapi.com/?apikey=${APIkey}&i=${id}&page=${page}&type="movie"`);
-    const data = await resp.json();
-    modalMovieDetails(data, div);
-  } catch (err) {
-    console.log(`Hubo un error: ${err}`);
-  } finally {
-    console.log('Ejecutó el finally');
-  }
-}
-
-
-// modal con datos de la pelicula
+// modal
 async function modalMovieDetails(data, div) {
   const content = div.querySelector('.modal-content');
 
-  // obtengo respuesta de indexedDB y guardo en variable el imdbID de la pelicula
+  // indexedDB
   let movieID = await getMovie(data.imdbID);
 
   // elementos HTML
@@ -244,7 +249,7 @@ async function modalMovieDetails(data, div) {
   favButton.className = 'btn btn-primary w-100 btnFav';
   favButton.textContent = movieID ? 'Quitar de favoritos' : 'Agregar a favoritos';
 
-  // Construir la estructura del modal
+  // estructura del modal
   modalHeader.append(image, detailsContainer);
   detailsContainer.append(titleElement, genreElement, countryElement, ratingContainer);
   ratingContainer.append(ratingBadge, heartIcon);
@@ -256,18 +261,18 @@ async function modalMovieDetails(data, div) {
 
   modalFooter.appendChild(favButton);
 
-  // Agregar los elementos al contenido del modal
+  // agregar elementos al modal
   content.append(modalHeader, modalBody, modalFooter);
 
   MovieTrailer(data.Title, data.imdbID);
 }
 
-// elementos de lista
+// modal - elementos de lista
 function createListItem(label, value) {
   const listItem = document.createElement('li');
   listItem.className = 'list-group-item fw-semibold';
   listItem.textContent = `${label} `;
-  
+
   const valueSpan = document.createElement('span');
   valueSpan.className = 'fw-normal';
   valueSpan.textContent = value;
@@ -279,7 +284,7 @@ function createListItem(label, value) {
 
 
 
-// trailer
+// modal - trailer youtube
 async function MovieTrailer(movie, id) {
   const options = {
     method: 'GET',
@@ -324,72 +329,49 @@ async function MovieTrailer(movie, id) {
   }
 }
 
-// favoritos
+// favoritos - guardar
 function setFav(movie, btn) {
   btn.addEventListener('click', () => {
+    if (btn.classList.contains('bi-heart')) {
+      btn.classList.replace('bi-heart', 'bi-heart-fill');
 
-    if (btn.innerText != 'Ver más!') {
-      if (btn.classList.contains('bi-heart')) {
-        btn.classList.remove('bi-heart');
-        btn.classList.add('bi-heart-fill');
-        saveData(movie);
-      } else {
-        btn.classList.add('bi-heart');
-        btn.classList.remove('bi-heart-fill');
-        deleteFav(movie.imdbID);
-      }
+      // idexedDB
+      saveData(movie);
+    } else {
+      btn.classList.replace('bi-heart-fill', 'bi-heart');
+
+      // idexedDB
+      deleteFav(movie.imdbID);
     }
-  })
+  });
 }
 
-// get favoritos
+
+// favoritos - get movies
 async function actualizarDataFavoritos() {
   spinner(resultElement);
-  // Obtener los datos de favoritos utilizando getMovie()
-  const favoritos = await getData();
 
-  // Llamar a setData() con los datos de favoritos
-  resultElement.innerHTML = '';
-  spinner(resultElement);
+  try {
+    // idexedDB
+    const favoritos = await getData();
 
-  setTimeout(() => {
-    if (favoritos.length) {
-      resultElement.innerHTML = '<h2 class="w-100 h2 m-0 mb-2">favoritos</h2>';
-      setData(favoritos);
-    } else {
-      resultElement.innerHTML = '<p>Aún no tienes películas favoritas.</p>'
-    }
-  }, 500)
-}
-
-// manejo links
-function setEventListeners() {
-  const homeLink = document.getElementById('home');
-  const favoritosLink = document.getElementById('fav');
-  const btnNews = document.getElementById('news');
-
-  homeLink.addEventListener('click', () => {
-    const value = localStorage.getItem("search_value");
-    spinner(resultElement)
+    resultElement.innerHTML = '';
+    spinner(resultElement);
 
     setTimeout(() => {
-      if (value) {
-        apiCall(value);
+      if (favoritos.length) {
+        resultElement.innerHTML = '<h2 class="w-100 h2 m-0 mb-2">favoritos</h2>';
+        setData(favoritos);
       } else {
-        salvaVidas();
+        resultElement.innerHTML = '<p>Aún no tienes películas favoritas.</p>';
       }
-    }, 500)
-  });
-
-  favoritosLink.addEventListener('click', () => {
-    actualizarDataFavoritos();
-  });
-
-  // Agregar el evento de clic al botón "Novedades"
-  btnNews.addEventListener('click', handleClickNovedades);
+    }, 500);
+  } catch (error) {
+    console.error(error);
+  }
 }
 
-//novedades
+// novedades - ultimas peliculas del año
 async function obtenerTrailersUltimasPeliculas() {
   const fechaActual = new Date();
   const anioActual = fechaActual.getFullYear();
@@ -405,60 +387,67 @@ async function obtenerTrailersUltimasPeliculas() {
     });
     return trailersUltimasPeliculas;
   } catch (error) {
-    throw new Error('Error al obtener los trailers: ' + error);
+    console.error('Error al obtener los trailers:', error);
+    throw error;
   }
 }
 
-// Función para manejar el evento de clic en el botón "Novedades"
-function handleClickNovedades() {
+// novedades - video youtube
+async function handleClickNovedades() {
   spinner(resultElement);
 
-  obtenerTrailersUltimasPeliculas()
-    .then(trailers => {
-      setTimeout(() => {
-        resultElement.innerHTML = '<h2 class="w-100 h2 m-0 mb-2">descubrí las últimas películas aclamadas por la crítica</h2>';
-        const row = document.createElement('div');
-        row.classList.add('row', 'row-cols-1', 'g-3', 'news');
-        resultElement.appendChild(row);
+  try {
+    const trailers = await obtenerTrailersUltimasPeliculas();
+    setTimeout(() => {
+      resultElement.innerHTML = '<h2 class="w-100 h2 m-0 mb-2">descubrí las últimas películas aclamadas por la crítica</h2>';
+      const row = document.createElement('div');
+      row.classList.add('row', 'row-cols-1', 'g-3', 'news');
+      resultElement.appendChild(row);
 
-        // Crear la tarjeta para cada trailer
-        trailers.forEach(trailer => {
-          const titulo = trailer.snippet.title;
-          const videoId = trailer.id.videoId;
-          const videoUrl = `https://www.youtube.com/embed/${videoId}`;
+      trailers.forEach(trailer => {
+        const { snippet: { title }, id: { videoId }, snippet: { description } } = trailer;
+        const videoUrl = `https://www.youtube.com/embed/${videoId}`;
 
-          // Crear elementos HTML de la tarjeta
-          const card = document.createElement('div');
-          card.classList.add('card', 'text-white', 'bg-dark');
+        const card = document.createElement('div');
+        card.classList.add('card', 'text-white', 'bg-dark');
 
-          const cardBody = document.createElement('div');
-          cardBody.classList.add('card-body', 'card-body-news');
+        const cardBody = document.createElement('div');
+        cardBody.classList.add('card-body', 'card-body-news');
 
-          const tituloElement = document.createElement('h5');
-          tituloElement.classList.add('card-title');
-          tituloElement.textContent = titulo;
+        const tituloElement = document.createElement('h5');
+        tituloElement.classList.add('card-title');
+        tituloElement.textContent = title;
 
-          const iframe = document.createElement('iframe');
-          iframe.classList.add('embed-responsive-item');
-          iframe.src = videoUrl;
-          iframe.allowFullscreen = true;
+        const iframe = document.createElement('iframe');
+        iframe.classList.add('embed-responsive-item');
+        iframe.src = videoUrl;
+        iframe.allowFullscreen = true;
 
-          const cardText = document.createElement('p');
-          cardText.classList.add('card-text', 'text-white');
-          cardText.textContent = trailer.snippet.description;
+        const cardText = document.createElement('p');
+        cardText.classList.add('card-text', 'text-white');
+        cardText.textContent = description;
 
-          // Construir la estructura de la tarjeta
-          cardBody.appendChild(tituloElement);
-          cardBody.appendChild(cardText);
-          cardBody.appendChild(iframe);
-          card.appendChild(cardBody);
-          row.appendChild(card);
-        });
-      }, 500);
-    })
-    .catch(error => {
-      console.error(error);
-    });
+        cardBody.appendChild(tituloElement);
+        cardBody.appendChild(cardText);
+        cardBody.appendChild(iframe);
+        card.appendChild(cardBody);
+        row.appendChild(card);
+      });
+    }, 500)
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// links
+function setEventListeners() {
+  const homeLink = document.getElementById('home');
+  const favoritosLink = document.getElementById('fav');
+  const btnNews = document.getElementById('news');
+
+  homeLink.addEventListener('click', getLocalStorage);
+  favoritosLink.addEventListener('click', actualizarDataFavoritos);
+  btnNews.addEventListener('click', handleClickNovedades);
 }
 
 // spinner de carga
@@ -476,12 +465,12 @@ function spinner(resultado) {
   }
 };
 
-//salvavidas
+// salvavidas
 function salvaVidas() {
   resultElement.innerHTML = "<p>Lo sentimos, no hemos encontrado los resultados de su busqueda.</p>"
 }
 
-//funciones
+// funciones
 window.addEventListener('DOMContentLoaded', getLocalStorage);
 btn();
 btnKey();

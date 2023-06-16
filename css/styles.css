@@ -234,6 +234,10 @@ span{
   color: black !important;
 }
 
+.bi{
+  display: flex !important;
+}
+
 .modal-footer{
   border: none;
 }
@@ -298,8 +302,12 @@ btn-check:focus+.btn, .btn:focus {
     --bs-gradient: none;
     text-transform: none !important;
   }
-  .card:hover img, .card:hover .card-container{
-    transform: scale(1.15);
+  .card-img-overlay:hover .btn-details{
+    opacity: 1;
+  }
+  button.btn-details{
+    transition: all .2s ease-in-out;
+    opacity: 0;
   }
 }
 
