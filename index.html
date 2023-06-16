@@ -18,12 +18,13 @@
 
 <body>
 
-  <nav class="navbar navbar-expand-lg m-auto px-3 px-md-5 w-100 justify-content-center align-items-center">
+  <nav
+    class="navbar navbar-expand-lg m-auto px-3 px-md-5 w-100 justify-content-center align-items-center position-relative">
     <div class="pt-3 d-block w-100 px-0">
       <div class="row w-100 align-items-center px-0 m-0">
         <div class="navbar-brand col ps-0">
           <a href="#">
-            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="black" class="bi bi-camera-reels"
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="#f3dec9" class="bi bi-camera-reels"
               viewBox="0 0 16 16">
               <path d="M6 3a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM1 3a2 2 0 1 0 4 0 2 2 0 0 0-4 0z" />
               <path
@@ -32,38 +33,38 @@
             </svg>
           </a>
         </div>
-        <div class="col text-center"><span>movies-channel</span></div>
+        <div class="col text-center text-nowrap"><span>movies-channel</span></div>
         <div class="col text-end pe-0">
-          <button class="navbar-toggler col" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo03"
-          aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse justify-content-end" id="navbarTogglerDemo03">
-            <div class="row navbar-nav g-1">
-              <div class="nav-item col m-0 mt-3 mt-lg-0"><button id="home" class="btn text-uppercase">Inicio</button></div>
-              <div class="nav-item col m-0 mt-3 mt-lg-0"><button id="fav" class="btn text-uppercase">Favoritos</button></div>
-              <div class="nav-item col m-0 mt-3 mt-lg-0"><button class="btn text-uppercase">Novedades</button></div>
+          <button class="navbar-toggler col" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false"
+            aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse justify-content-end p-3 pb-5 p-lg-0" id="navbarTogglerDemo03">
+            <div class="row navbar-nav">
+              <div class="nav-item col m-0 mt-3 mt-lg-0 text-center"><button class="p-0" id="home">Inicio</button></div>
+              <div class="nav-item col m-0 mt-3 mt-lg-0 text-center"><button class="p-0" id="fav">Favoritos</button></div>
+              <div class="nav-item col m-0 mt-3 mt-lg-0 text-center"><button class="p-0" id="news">Novedades</button></div>
             </div>
+          </div>
         </div>
-        </div>
-      </div> 
+      </div>
     </div>
   </nav>
 
-  <div class="container-fluid pt-5 px-3 px-md-5 m-auto w-100 mb-5">
+  <div class="container-fluid pt-3 px-3 px-md-5 m-auto w-100 mb-5">
     <main class="row g-3 justify-content-center">
       <div class="col-12">
         <h1 class="mb-2 text-center text-md-start">movies-channel</h1>
         <div class="col-md-6 col-lg-4 mb-3">
           <div class="input-group mb-3">
-            <input type="text" id="inputBusqueda" class="form-control" placeholder="Ingrese la pelicula a buscar"
-              aria-label="place">
+            <input type="text" id="inputBusqueda" class="form-control" placeholder="Buscar películas" aria-label="place">
             <button id="buscar" type="submit" class="btn btn-primary fw-semibold">Buscar</button>
           </div>
         </div>
       </div>
       <div class="col-12">
-        <div id="resultado" class="row row-cols-sm-3 row-cols-lg-4 g-3"></div>
+        <div id="resultado"></div>
       </div>
     </main>
   </div>
