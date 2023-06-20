@@ -118,6 +118,7 @@ function setData(data) {
     cardOverlay.append(cardContainer);
 
     const cardContent = document.createElement("div");
+    cardContent.classList.add('text-transition');
     cardContainer.append(cardContent);
 
     const cardTitleContainer = document.createElement("div");
@@ -131,7 +132,12 @@ function setData(data) {
 
     const favIcon = document.createElement("i");
     favIcon.id = `btn1-${movie.imdbID}`;
-    favIcon.classList.add('bi', movieID ? 'bi-heart-fill' : 'bi-heart', 'fs-5', 'fav-icon', 'ms-2');
+    favIcon.classList.add('bi', movieID ? 'bi-heart-fill' : 'bi-heart', 'fs-5', 'fav-btn', 'ms-2', 'card-fav-btn', `heart-modal-${movie.imdbID}`);
+    favIcon.dataset.id = movie.imdbID;
+    favIcon.dataset.title = movie.Title;
+    favIcon.dataset.poster = movie.Poster;
+    favIcon.dataset.year = movie.Year;
+    favIcon.dataset.type = movie.Type;
     cardTitleContainer.append(favIcon);
 
     const cardText = document.createElement("p");
@@ -164,9 +170,6 @@ function setData(data) {
     const modalContent = document.createElement("div");
     modalContent.classList.add('modal-content');
     modalDialog.append(modalContent);
-
-    let btnFav = div.querySelector(`#btn1-${movie.imdbID}`);
-    setFav(movie, btnFav);
 
     let btn = div.querySelector('.btn-details');
     let id = btn.dataset.id;
@@ -214,7 +217,8 @@ async function modalMovieDetails(data, div) {
   ratingBadge.textContent = data.imdbRating;
 
   const heartIcon = document.createElement('i');
-  heartIcon.className = `bi ${movieID ? 'bi-heart-fill' : 'bi-heart'} d-block fs-5 ms-2 fav-icon`;
+  heartIcon.dataset.id = data.imdbID;
+  heartIcon.className = `bi ${movieID ? 'bi-heart-fill' : 'bi-heart'} heart-modal-${data.imdbID} d-block fs-5 ms-2`;
 
   const closeButton = document.createElement('button');
   closeButton.type = 'button';
@@ -245,8 +249,12 @@ async function modalMovieDetails(data, div) {
 
   const favButton = document.createElement('button');
   favButton.type = 'button';
-  favButton.setAttribute('data-id', data.imdbID);
-  favButton.className = 'btn btn-primary w-100 btnFav';
+  favButton.dataset.id = data.imdbID;
+  favButton.dataset.title = data.Title;
+  favButton.dataset.poster = data.Poster;
+  favButton.dataset.year = data.Year;
+  favButton.dataset.type = data.Type;
+  favButton.className = 'btn btn-primary w-100 fav-btn modal-fav-btn';
   favButton.textContent = movieID ? 'Quitar de favoritos' : 'Agregar a favoritos';
 
   // estructura del modal
@@ -329,25 +337,76 @@ async function MovieTrailer(movie, id) {
   }
 }
 
-// favoritos - guardar
-function setFav(movie, btn) {
-  btn.addEventListener('click', () => {
-    if (btn.classList.contains('bi-heart')) {
-      btn.classList.replace('bi-heart', 'bi-heart-fill');
 
-      // idexedDB
-      saveData(movie);
+// favoritos
+async function handleFavoriteClick(e) {
+  const btnFav = e.target;
+  if (!btnFav.classList.contains('fav-btn')) {
+    return;
+  }
+
+  const id = btnFav.dataset.id || false;
+  const title = btnFav.dataset.title || false;
+  const poster = btnFav.dataset.poster || false;
+  const year = btnFav.dataset.year || false;
+  const type = btnFav.dataset.type || false;
+
+  const movie = {
+    imdbID: id,
+    Title: title,
+    Poster: poster,
+    Year: year,
+    Type: type
+  };
+
+
+  const btn = btnFav.classList.contains('bi') ? 'A' : 'B';
+
+  try {
+    const isFavorite = await getMovie(id) ? true : false;
+    console.log(isFavorite)
+    if (!isFavorite) {
+      await saveData(movie);
+      if (btn === 'A') {
+        let hearts = document.querySelectorAll(`.heart-modal-${id}`);
+        hearts.forEach(heart => {
+          heart.classList.remove('bi-heart');
+          heart.classList.add('bi-heart-fill');
+        })
+        document.querySelector('.modal-fav-btn').innerText = 'Quitar de favoritos';
+      } else {
+        btnFav.innerText = 'Quitar de favoritos';
+        let hearts = document.querySelectorAll(`.heart-modal-${id}`);
+        hearts.forEach(heart => {
+          heart.classList.remove('bi-heart');
+          heart.classList.add('bi-heart-fill');
+        })
+      }
     } else {
-      btn.classList.replace('bi-heart-fill', 'bi-heart');
-
-      // idexedDB
-      deleteFav(movie.imdbID);
+      await deleteFav(movie.imdbID);
+      if (btn === 'A') {
+        let hearts = document.querySelectorAll(`.heart-modal-${id}`);
+        hearts.forEach(heart => {
+          heart.classList.remove('bi-heart-fill');
+          heart.classList.add('bi-heart');
+        })
+        document.querySelector('.modal-fav-btn').innerText = 'Agregar a favoritos';
+      } else {
+        btnFav.innerText = 'Agregar a favoritos';
+        let hearts = document.querySelectorAll(`.heart-modal-${id}`);
+        hearts.forEach(heart => {
+          heart.classList.remove('bi-heart-fill');
+          heart.classList.add('bi-heart');
+        })
+      }
     }
-  });
+  } catch (error) {
+    console.error("Error handling favorite:", error);
+  }
 }
 
 
-// favoritos - get movies
+// favoritos - actualizar seccion
 async function actualizarDataFavoritos() {
   spinner(resultElement);
 
@@ -401,21 +460,23 @@ async function handleClickNovedades() {
     setTimeout(() => {
       resultElement.innerHTML = '<h2 class="w-100 h2 m-0 mb-2">descubrí las últimas películas aclamadas por la crítica</h2>';
       const row = document.createElement('div');
-      row.classList.add('row', 'row-cols-1', 'g-3', 'news');
+      row.classList.add('row', 'row-cols-1', 'row-cols-lg-2', 'g-4', 'news');
       resultElement.appendChild(row);
 
       trailers.forEach(trailer => {
         const { snippet: { title }, id: { videoId }, snippet: { description } } = trailer;
         const videoUrl = `https://www.youtube.com/embed/${videoId}`;
 
+        const div = document.createElement('div');
+
         const card = document.createElement('div');
-        card.classList.add('card', 'text-white', 'bg-dark');
+        card.classList.add('card', 'text-white', 'h-100');
 
         const cardBody = document.createElement('div');
         cardBody.classList.add('card-body', 'card-body-news');
 
-        const tituloElement = document.createElement('h5');
-        tituloElement.classList.add('card-title');
+        const tituloElement = document.createElement('h3');
+        tituloElement.classList.add('card-title', 'h3');
         tituloElement.textContent = title;
 
         const iframe = document.createElement('iframe');
@@ -427,11 +488,10 @@ async function handleClickNovedades() {
         cardText.classList.add('card-text', 'text-white');
         cardText.textContent = description;
 
-        cardBody.appendChild(tituloElement);
-        cardBody.appendChild(cardText);
-        cardBody.appendChild(iframe);
+        cardBody.append(tituloElement, cardText, iframe);
         card.appendChild(cardBody);
-        row.appendChild(card);
+        row.appendChild(div);
+        div.appendChild(card);
       });
     }, 500)
   } catch (error) {
@@ -448,6 +508,7 @@ function setEventListeners() {
   homeLink.addEventListener('click', getLocalStorage);
   favoritosLink.addEventListener('click', actualizarDataFavoritos);
   btnNews.addEventListener('click', handleClickNovedades);
+  document.addEventListener('click', handleFavoriteClick);
 }
 
 // spinner de carga
