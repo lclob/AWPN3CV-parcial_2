@@ -59,7 +59,7 @@ function btnKey() {
 // API movies - card
 async function apiCall(value) {
   try {
-    const response = await fetch(`http://www.omdbapi.com/?apikey=${APIkey}&s=${value}&page=1&type="movie"`);
+    const response = await fetch(`https://www.omdbapi.com/?apikey=${APIkey}&s=${value}&page=1&type="movie"`);
     const data = await response.json();
 
     resultElement.innerHTML = '';
@@ -73,8 +73,9 @@ async function apiCall(value) {
 // API imdbID - modal
 async function APImovieDetails(id, div) {
   try {
-    const resp = await fetch(`http://www.omdbapi.com/?apikey=${APIkey}&i=${id}&page=1&type="movie"`);
+    const resp = await fetch(`https://www.omdbapi.com/?apikey=${APIkey}&i=${id}&page=1&type="movie"`);
     const data = await resp.json();
+
     modalMovieDetails(data, div);
   } catch (err) {
     console.log(`Hubo un error: ${err}`);
