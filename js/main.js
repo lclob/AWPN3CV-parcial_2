@@ -522,6 +522,7 @@ function setEventListeners() {
   const favoritosLink = document.getElementById('fav');
   const btnNews = document.getElementById('news');
 
+  window.addEventListener('DOMContentLoaded', getLocalStorage);
   homeLink.addEventListener('click', getLocalStorage);
   favoritosLink.addEventListener('click', actualizarDataFavoritos);
   btnNews.addEventListener('click', handleClickNovedades);
@@ -573,7 +574,6 @@ function mostrarTooltip(event) {
 
 
 // funciones
-window.addEventListener('DOMContentLoaded', getLocalStorage);
 btn();
 btnKey();
 setEventListeners();
