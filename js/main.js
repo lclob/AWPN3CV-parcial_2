@@ -11,14 +11,14 @@ const noImage = '../img/no_image.jpeg';
 // localStorage
 function getLocalStorage() {
   spinner(resultElement);
-  setTimeout(() => {
-    if (!localStorage.getItem("search_value")) {
+  if (!localStorage.getItem("search_value")) {
+    setTimeout(() => {
       start();
-    } else {
-      value = localStorage.getItem("search_value");
-      apiCall(value);
-    }
-  }, 500)
+    }, 500);
+  } else {
+    value = localStorage.getItem("search_value");
+    apiCall(value);
+  }
 }
 
 // home
@@ -27,11 +27,14 @@ function start(){
   const imageFigure = document.createElement('figure');
   imageFigure.classList.add('home-figure-img');
   const homeImage = document.createElement('img');
+  homeImage.id = 'home-image'
   homeImage.classList.add('home-img');
   homeImage.src = '../img/home2.jpg';
   homeImage.alt = 'Imagen de un cine';
   imageFigure.appendChild(homeImage);
   resultElement.appendChild(imageFigure);
+
+  homeImage.addEventListener('click', mostrarTooltip);
 }
 
 // search btn
@@ -61,7 +64,7 @@ function btnKey() {
       if (!value) {
         salvaVidas();
       } else {
-        localStorage.setItem(`search_value`, `${value}`)
+        localStorage.setItem(`search_value`, `${value}`);
         apiCall(value);
       }
     }
@@ -74,13 +77,17 @@ async function apiCall(value) {
   try {
     const response = await fetch(`https://www.omdbapi.com/?apikey=${APIkey}&s=${value}&page=1&type="movie"`);
     const data = await response.json();
-
-    resultElement.innerHTML = '';
-    setData(data.Search);
-  } catch (error) {
-    console.log(`Hubo un error: ${error}`);
-    salvaVidas();
-  }
+    
+    setTimeout(() => {
+      resultElement.innerHTML = '';
+      setData(data.Search);
+    }, 500)
+    } catch (error) {
+      console.log(`Hubo un error: ${error}`);
+      setTimeout(() => {
+        salvaVidas();
+      },500);
+    }
 }
 
 // API imdbID - modal
@@ -538,8 +545,32 @@ function spinner(resultado) {
 
 // salvavidas
 function salvaVidas() {
-  resultElement.innerHTML = "<p>Lo sentimos, no hemos encontrado los resultados de su busqueda.</p>"
+  spinner(resultElement);
+  setTimeout(() => {
+    resultElement.innerHTML = "<p>Lo sentimos, no hemos encontrado los resultados de su busqueda.</p>"
+  }, 500)
 }
+
+// tooltip
+function mostrarTooltip(event) {
+  const tooltip = document.createElement('div');
+  tooltip.classList.add('home-tooltip');
+  tooltip.innerText = 'Busca una película';
+
+  tooltip.style.left = event.clientX + 'px';
+  tooltip.style.top = event.clientY + 'px';
+
+  resultElement.appendChild(tooltip);
+
+  setTimeout(() => {
+    tooltip.style.opacity = '0';
+    setTimeout(() => {
+      tooltip.remove();
+    }, 200);
+  }, 1500);
+}
+
+
 
 // funciones
 window.addEventListener('DOMContentLoaded', getLocalStorage);
