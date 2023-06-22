@@ -1,7 +1,7 @@
 {
     "theme_color": "#fff375",
     "background_color": "#fff375",
-    "display": "browser",
+    "display": "minimal-ui",
     "scope": "/",
     "start_url": "/",
     "name": "movies-channel",
