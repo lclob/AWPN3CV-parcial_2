@@ -13,12 +13,25 @@ function getLocalStorage() {
   spinner(resultElement);
   setTimeout(() => {
     if (!localStorage.getItem("search_value")) {
-      btn();
+      start();
     } else {
       value = localStorage.getItem("search_value");
       apiCall(value);
     }
   }, 500)
+}
+
+// home
+function start(){
+  resultElement.innerHTML = '';
+  const imageFigure = document.createElement('figure');
+  imageFigure.classList.add('home-figure-img');
+  const homeImage = document.createElement('img');
+  homeImage.classList.add('home-img');
+  homeImage.src = '../img/home2.jpg';
+  homeImage.alt = 'Imagen de un cine';
+  imageFigure.appendChild(homeImage);
+  resultElement.appendChild(imageFigure);
 }
 
 // search btn
