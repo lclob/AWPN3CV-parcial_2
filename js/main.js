@@ -67,8 +67,6 @@ async function apiCall(value) {
   } catch (error) {
     console.log(`Hubo un error: ${error}`);
     salvaVidas();
-  } finally {
-    console.log('ejecuto el finally');
   }
 }
 
@@ -80,8 +78,6 @@ async function APImovieDetails(id, div) {
     modalMovieDetails(data, div);
   } catch (err) {
     console.log(`Hubo un error: ${err}`);
-  } finally {
-    console.log('Ejecutó el finally');
   }
 }
 
@@ -364,7 +360,7 @@ async function handleFavoriteClick(e) {
 
   try {
     const isFavorite = await getMovie(id) ? true : false;
-    console.log(isFavorite)
+    
     if (!isFavorite) {
       await saveData(movie);
       if (btn === 'A') {
