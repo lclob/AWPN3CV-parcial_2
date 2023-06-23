@@ -13,7 +13,7 @@ function getLocalStorage() {
   spinner(resultElement);
   if (!localStorage.getItem("search_value")) {
     setTimeout(() => {
-      start();
+      home();
     }, 500);
   } else {
     value = localStorage.getItem("search_value");
@@ -22,15 +22,18 @@ function getLocalStorage() {
 }
 
 // home
-function start(){
+function home(){
   resultElement.innerHTML = '';
+
   const imageFigure = document.createElement('figure');
   imageFigure.classList.add('home-figure-img');
+
   const homeImage = document.createElement('img');
   homeImage.id = 'home-image'
   homeImage.classList.add('home-img');
   homeImage.src = '../img/home2.jpg';
   homeImage.alt = 'Imagen de un cine';
+  
   imageFigure.appendChild(homeImage);
   resultElement.appendChild(imageFigure);
 
@@ -45,7 +48,7 @@ function btn() {
     value = inputElement.value;
 
     if (!value) {
-      salvaVidas();
+      salvaVidas("<p>Lo sentimos, no hemos encontrado los resultados de su busqueda.</p>");
     } else {
       localStorage.setItem(`search_value`, `${value}`)
       apiCall(value);
@@ -62,7 +65,7 @@ function btnKey() {
       value = inputElement.value;
 
       if (!value) {
-        salvaVidas();
+        salvaVidas("<p>Lo sentimos, no hemos encontrado los resultados de su busqueda.</p>");
       } else {
         localStorage.setItem(`search_value`, `${value}`);
         apiCall(value);
@@ -75,7 +78,7 @@ function btnKey() {
 // API movies - card
 async function apiCall(value) {
   try {
-    const response = await fetch(`https://www.omdbapi.com/?apikey=${APIkey}&s=${value}&page=1&type="movie"`);
+    const response = await fetch(`https://www.omdbapi.com/?apikey=${APIkey}&s=${value}&page=1&type=movie`);
     const data = await response.json();
     
     setTimeout(() => {
@@ -85,7 +88,7 @@ async function apiCall(value) {
     } catch (error) {
       console.log(`Hubo un error: ${error}`);
       setTimeout(() => {
-        salvaVidas();
+        salvaVidas("<p>Lo sentimos, no hemos encontrado los resultados de su busqueda.</p>");
       },500);
     }
 }
@@ -516,7 +519,7 @@ async function handleClickNovedades() {
   }
 }
 
-// links
+// eventos
 function setEventListeners() {
   const homeLink = document.getElementById('home');
   const favoritosLink = document.getElementById('fav');
@@ -524,9 +527,11 @@ function setEventListeners() {
 
   window.addEventListener('DOMContentLoaded', getLocalStorage);
   homeLink.addEventListener('click', getLocalStorage);
-  favoritosLink.addEventListener('click', actualizarDataFavoritos);
   btnNews.addEventListener('click', handleClickNovedades);
   document.addEventListener('click', handleFavoriteClick);
+  favoritosLink.addEventListener('click', actualizarDataFavoritos);
+  btn();
+  btnKey();
 }
 
 // spinner de carga
@@ -545,10 +550,10 @@ function spinner(resultado) {
 };
 
 // salvavidas
-function salvaVidas() {
+function salvaVidas(text) {
   spinner(resultElement);
   setTimeout(() => {
-    resultElement.innerHTML = "<p>Lo sentimos, no hemos encontrado los resultados de su busqueda.</p>"
+    resultElement.innerHTML = text;
   }, 500)
 }
 
@@ -568,12 +573,14 @@ function mostrarTooltip(event) {
     setTimeout(() => {
       tooltip.remove();
     }, 200);
-  }, 1500);
+  }, 1200);
 }
 
 
 
-// funciones
-btn();
-btnKey();
-setEventListeners();
+// start
+if (navigator.onLine){
+  setEventListeners();
+} else{
+  salvaVidas('<div>Lo sentimos, parece que no tienes conexión a internet.</div><div>Vuelve a intentarlo más tarde.</div>')
+}
