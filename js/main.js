@@ -81,16 +81,18 @@ async function apiCall(value) {
     const response = await fetch(`https://www.omdbapi.com/?apikey=${APIkey}&s=${value}&page=1&type=movie`);
     const data = await response.json();
     
-    setTimeout(() => {
-      resultElement.innerHTML = '';
-      setData(data.Search);
-    }, 500)
-    } catch (error) {
-      console.log(`Hubo un error: ${error}`);
+    if(data.Response == "False"){
+      salvaVidas("<p>Lo sentimos, no hemos encontrado los resultados de su busqueda.</p>");
+    } else{
       setTimeout(() => {
-        salvaVidas("<p>Lo sentimos, no hemos encontrado los resultados de su busqueda.</p>");
-      },500);
+        resultElement.innerHTML = '';
+        setData(data.Search);
+      }, 500)
     }
+  } catch (error) {
+    console.log(`Hubo un error: ${error}`);
+    salvaVidas("<p>Lo sentimos, no hemos encontrado los resultados de su busqueda.</p>");
+  }
 }
 
 // API imdbID - modal
@@ -530,8 +532,6 @@ function setEventListeners() {
   btnNews.addEventListener('click', handleClickNovedades);
   document.addEventListener('click', handleFavoriteClick);
   favoritosLink.addEventListener('click', actualizarDataFavoritos);
-  btn();
-  btnKey();
 }
 
 // spinner de carga
@@ -581,6 +581,8 @@ function mostrarTooltip(event) {
 // start
 if (navigator.onLine){
   setEventListeners();
+  btn();
+  btnKey();
 } else{
   salvaVidas('<div>Lo sentimos, parece que no tienes conexión a internet.</div><div>Vuelve a intentarlo más tarde.</div>')
 }
